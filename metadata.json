@@ -1,0 +1,5 @@
+{
+  "name": "Temporary Space Management (TSM)",
+  "description": "A workflow management system for allocating and approving temporary storage space for industrial machines and accessories, featuring multi-stage approval chains and automated rate calculations.",
+  "requestFramePermissions": []
+}

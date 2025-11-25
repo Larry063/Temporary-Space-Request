@@ -1,0 +1,80 @@
+export enum UserRole {
+  ADMIN = 'Admin',
+  REQUESTER = 'Requester',
+  BUM = 'BUM',
+  WCM = 'WCM',
+  IE_FM = 'IE FM',
+  MFG_FM = 'MFG FM',
+  IE_PLANT = 'IE Plant'
+}
+
+export enum RequestStatus {
+  DRAFT = 'Draft',
+  PENDING = 'Pending Approval',
+  APPROVED = 'Approved',
+  REJECTED = 'Rejected',
+  EXPIRED = 'Expired', // System detected date passed
+  AWAITING_INSPECTION = 'Awaiting Inspection', // Requester claimed vacated, IE Plant to check
+  COMPLETED = 'Completed', // Successfully removed
+  OVERSTAY = 'Overstay (Penalty)' // IE Plant found item still there
+}
+
+export interface User {
+  id: string;
+  name: string;
+  email: string;
+  role: UserRole;
+  department?: string;
+}
+
+export interface UserNotification {
+  id: string;
+  userId: string;
+  type: 'success' | 'alert' | 'info';
+  message: string;
+  timestamp: string;
+  read: boolean;
+  relatedRequestId?: string;
+}
+
+export interface SpaceRequest {
+  id: string;
+  requesterId: string;
+  requesterName: string;
+  machineName: string;
+  serialNumber: string;
+  workCell: string;
+  costCenter: string;
+  dateIn: string;
+  dateOut: string;
+  length: number; // in meters
+  width: number; // in meters
+  height: number; // in meters
+  calculatedRate: number;
+  status: RequestStatus;
+  currentApproverRole: UserRole | null; // Who needs to approve next
+  approvalHistory: ApprovalAction[];
+  createdAt: string;
+  aiAnalysis?: string; // Optional AI feedback
+}
+
+export interface ApprovalAction {
+  role: UserRole;
+  approverName: string;
+  status: 'Approved' | 'Rejected' | 'Verified' | 'Flagged';
+  timestamp: string;
+  comment?: string;
+}
+
+export interface RateConfig {
+  baseRatePerSquareFoot: number; // Changed from Cubic Meter to SqFt
+  currency: string;
+}
+
+export const APPROVAL_CHAIN = [
+  UserRole.BUM,
+  UserRole.WCM,
+  UserRole.IE_FM,
+  UserRole.MFG_FM,
+  UserRole.IE_PLANT
+];
