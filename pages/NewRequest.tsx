@@ -16,6 +16,7 @@ export const NewRequest: React.FC<Props> = ({ currentUser, onSuccess, preFillDat
   const [analyzing, setAnalyzing] = useState(false);
   const [aiFeedback, setAiFeedback] = useState<string | null>(null);
   const [config, setConfig] = useState<RateConfig>(StorageService.getRateConfig());
+  const [todayStr, setTodayStr] = useState('');
 
   const [formData, setFormData] = useState({
     machineName: '',
@@ -32,12 +33,15 @@ export const NewRequest: React.FC<Props> = ({ currentUser, onSuccess, preFillDat
   const [estimatedCost, setEstimatedCost] = useState(0);
   const [areaSqFt, setAreaSqFt] = useState(0);
 
+  useEffect(() => {
+    // Set today's date string for min attribute
+    setTodayStr(new Date().toISOString().split('T')[0]);
+  }, []);
+
   // Load pre-fill data if available (Renewal flow)
   useEffect(() => {
       if (preFillData) {
-          const today = new Date();
-          const nextWeek = addDays(today, 7);
-          
+          // Pre-fill only machine specs, leave dates blank for user selection
           setFormData({
               machineName: preFillData.machineName,
               serialNumber: preFillData.serialNumber,
@@ -46,10 +50,10 @@ export const NewRequest: React.FC<Props> = ({ currentUser, onSuccess, preFillDat
               length: preFillData.length,
               width: preFillData.width,
               height: preFillData.height,
-              dateIn: today.toISOString().split('T')[0],
-              dateOut: nextWeek.toISOString().split('T')[0]
+              dateIn: '', // User must select new date
+              dateOut: '' // User must select new date
           });
-          setAiFeedback("System Note: This is a renewal of a previous item. AI check skipped.");
+          setAiFeedback("System Note: Renewal initiated. Please select new dates for this allocation.");
       }
   }, [preFillData]);
 
@@ -111,8 +115,8 @@ export const NewRequest: React.FC<Props> = ({ currentUser, onSuccess, preFillDat
     }, 800);
   };
 
-  // High contrast white input fields
-  const InputField = ({ label, icon: Icon, name, type = "text", placeholder, step }: any) => (
+  // High contrast white input fields with Enhanced Picker logic
+  const InputField = ({ label, icon: Icon, name, type = "text", placeholder, step, min }: any) => (
     <div className="relative group transition-all duration-300 hover:-translate-y-1">
       <div className="flex items-center space-x-2 mb-2">
         {Icon && <Icon size={14} className="text-brand-600" />}
@@ -124,11 +128,31 @@ export const NewRequest: React.FC<Props> = ({ currentUser, onSuccess, preFillDat
           type={type}
           step={step}
           name={name}
+          min={min}
           value={formData[name as keyof typeof formData]}
           onChange={handleChange}
-          className="w-full px-4 py-3 bg-white border border-industrial-200 rounded-lg text-industrial-900 font-mono text-sm placeholder-industrial-300 focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 outline-none transition-all shadow-sm hover:shadow-md"
+          onClick={(e) => {
+             // Force open picker on click for date inputs
+             if (type === 'date' && 'showPicker' in HTMLInputElement.prototype) {
+                 try { (e.target as HTMLInputElement).showPicker(); } catch(err) {}
+             }
+          }}
+          onFocus={(e) => {
+              // Force open picker on focus for date inputs
+             if (type === 'date' && 'showPicker' in HTMLInputElement.prototype) {
+                 try { (e.target as HTMLInputElement).showPicker(); } catch(err) {}
+             }
+          }}
+          className={`w-full px-4 py-3 bg-white border border-industrial-200 rounded-lg text-industrial-900 font-mono text-sm placeholder-industrial-300 focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 outline-none transition-all shadow-sm hover:shadow-md ${type === 'date' ? 'cursor-pointer appearance-none' : ''}`}
           placeholder={placeholder}
         />
+        {/* Visual indicator for date fields if it's empty */}
+        {type === 'date' && !formData[name as keyof typeof formData] && (
+           <div className="absolute right-3 top-3 pointer-events-none text-industrial-300">
+              <Calendar size={16} />
+           </div>
+        )}
+        
         <div className="absolute right-3 top-3 pointer-events-none opacity-0 group-focus-within:opacity-100 transition-opacity">
            <div className="w-2 h-2 bg-brand-500 rounded-full animate-pulse"></div>
         </div>
@@ -157,7 +181,7 @@ export const NewRequest: React.FC<Props> = ({ currentUser, onSuccess, preFillDat
       {preFillData && (
           <div className="mb-6 bg-brand-50 border border-brand-200 p-4 rounded-xl flex items-center gap-3 animate-pulse">
               <RefreshCw size={20} className="text-brand-600" />
-              <div className="text-brand-800 text-sm font-bold">Renewal Mode: Data pre-filled from expired request {preFillData.id}. Verify dates before submitting.</div>
+              <div className="text-brand-800 text-sm font-bold">Renewal Mode: Machine specs loaded. Please Select New Dates.</div>
           </div>
       )}
 
@@ -243,8 +267,20 @@ export const NewRequest: React.FC<Props> = ({ currentUser, onSuccess, preFillDat
               </div>
 
               <div className="grid grid-cols-2 gap-4">
-                <InputField label="Date In" name="dateIn" type="date" icon={Calendar} />
-                <InputField label="Date Out" name="dateOut" type="date" icon={Calendar} />
+                <InputField 
+                    label="Date In" 
+                    name="dateIn" 
+                    type="date" 
+                    icon={Calendar} 
+                    min={todayStr} 
+                />
+                <InputField 
+                    label="Date Out" 
+                    name="dateOut" 
+                    type="date" 
+                    icon={Calendar} 
+                    min={formData.dateIn || todayStr}
+                />
               </div>
             </div>
           </div>
