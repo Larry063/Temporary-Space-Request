@@ -67,8 +67,9 @@ export interface ApprovalAction {
 }
 
 export interface RateConfig {
-  baseRatePerSquareFoot: number; // Changed from Cubic Meter to SqFt
+  baseRatePerSquareFoot: number;
   currency: string;
+  totalWarehouseSqFt: number; // Added capacity limit
 }
 
 export const APPROVAL_CHAIN = [

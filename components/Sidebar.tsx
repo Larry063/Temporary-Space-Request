@@ -1,6 +1,6 @@
 import React from 'react';
 import { User, UserRole } from '../types';
-import { LayoutDashboard, PlusCircle, Users, Settings, LogOut, FileText, Box } from 'lucide-react';
+import { LayoutDashboard, PlusCircle, Users, Settings, LogOut, FileText, Box, BarChart3 } from 'lucide-react';
 
 interface SidebarProps {
   currentUser: User;
@@ -49,8 +49,14 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentUser, onLogout, current
           </>
         )}
 
+        {/* Global Analytics - Available to All */}
+        <NavItem view="global-analytics" icon={BarChart3} label="FACILITY OVERVIEW" />
+
         {(currentUser.role === UserRole.ADMIN) && (
           <>
+            <div className="px-6 pt-4 pb-2">
+              <p className="text-[10px] font-bold text-industrial-500 uppercase tracking-widest">Admin Control</p>
+            </div>
             <NavItem view="admin-users" icon={Users} label="USER MGMT" />
             <NavItem view="admin-rates" icon={Settings} label="RATE CONFIG" />
             <NavItem view="admin-features" icon={PlusCircle} label="FEATURES" />

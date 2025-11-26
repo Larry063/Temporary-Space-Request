@@ -12,8 +12,9 @@ const INITIAL_USERS: User[] = [
 ];
 
 const INITIAL_RATE_CONFIG: RateConfig = {
-  baseRatePerSquareFoot: 4.20, // Updated to 4.2 USD as requested
-  currency: 'USD'
+  baseRatePerSquareFoot: 4.20,
+  currency: 'USD',
+  totalWarehouseSqFt: 50000 // Default 50k sqft capacity
 };
 
 // Seed some realistic requests for demo purposes
@@ -31,7 +32,7 @@ const INITIAL_REQUESTS: SpaceRequest[] = [
     length: 2.5,
     width: 1.5,
     height: 1.8,
-    calculatedRate: 2372.25, // Updated calc based on 4.2 rate
+    calculatedRate: 2372.25,
     status: RequestStatus.PENDING,
     currentApproverRole: UserRole.BUM,
     approvalHistory: [],
@@ -47,7 +48,7 @@ const INITIAL_REQUESTS: SpaceRequest[] = [
     workCell: 'Metal Stamping',
     costCenter: 'CC-MFG-102',
     dateIn: '2024-02-10',
-    dateOut: '2025-12-20', // UPDATED: Set to far future so it appears ACTIVE (Not Expired)
+    dateOut: '2025-12-20',
     length: 1.2,
     width: 1.2,
     height: 2.0,
@@ -94,12 +95,12 @@ const INITIAL_REQUESTS: SpaceRequest[] = [
     workCell: 'Testing Lab',
     costCenter: 'CC-TEST-100',
     dateIn: '2023-12-01',
-    dateOut: '2023-12-31', // Past date
+    dateOut: '2023-12-31',
     length: 2.0,
     width: 2.0,
     height: 1.5,
     calculatedRate: 11299.20,
-    status: RequestStatus.EXPIRED, // Manually set for demo
+    status: RequestStatus.EXPIRED,
     currentApproverRole: null,
     approvalHistory: [
         { role: UserRole.BUM, approverName: 'Alice BUM', status: 'Approved', timestamp: '2023-11-20T10:00:00Z' },
@@ -312,5 +313,55 @@ export const StorageService = {
               relatedRequestId: req.id
           });
       }
+  },
+  
+  sendAdminReminder: (userId: string, message: string) => {
+    StorageService.addNotification({
+      id: Date.now().toString() + Math.random().toString().slice(2, 6),
+      userId: userId,
+      type: 'info',
+      message: `ADMIN ALERT: ${message}`,
+      timestamp: new Date().toISOString(),
+      read: false
+    });
+  },
+
+  // --- Analytics Logic ---
+  getAnalyticsData: () => {
+    const requests = StorageService.getRequests();
+    const config = StorageService.getRateConfig();
+    
+    // Statuses that are considered "Occupying Space"
+    const activeStatuses = [
+        RequestStatus.APPROVED, 
+        RequestStatus.EXPIRED, 
+        RequestStatus.AWAITING_INSPECTION, 
+        RequestStatus.OVERSTAY
+    ];
+
+    let usedSqFt = 0;
+    const breakdown: Record<string, number> = {};
+
+    requests.forEach(req => {
+        if (activeStatuses.includes(req.status)) {
+            const sqFt = req.length * req.width * 10.764;
+            usedSqFt += sqFt;
+            
+            // Categorize by Work Cell
+            const category = req.workCell || 'Unassigned';
+            breakdown[category] = (breakdown[category] || 0) + sqFt;
+        }
+    });
+
+    const total = config.totalWarehouseSqFt || 50000;
+    
+    return {
+        totalCapacity: total,
+        usedSqFt: parseFloat(usedSqFt.toFixed(2)),
+        freeSqFt: parseFloat((total - usedSqFt).toFixed(2)),
+        percentageUsed: Math.min(100, (usedSqFt / total) * 100).toFixed(1),
+        breakdown,
+        allRequests: requests
+    };
   }
 };

@@ -5,6 +5,7 @@ import { DashboardRequester } from './pages/DashboardRequester';
 import { NewRequest } from './pages/NewRequest';
 import { DashboardApprover } from './pages/DashboardApprover';
 import { AdminPanel } from './pages/AdminPanel';
+import { GlobalAnalytics } from './pages/GlobalAnalytics';
 import { User, UserRole, SpaceRequest } from './types';
 
 const App: React.FC = () => {
@@ -47,6 +48,8 @@ const App: React.FC = () => {
         />;
       case 'approver-dashboard':
         return <DashboardApprover currentUser={user} />;
+      case 'global-analytics':
+        return <GlobalAnalytics />;
       case 'admin-users':
         return <AdminPanel view="users" />;
       case 'admin-rates':

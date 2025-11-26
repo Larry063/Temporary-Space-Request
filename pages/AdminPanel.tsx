@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { User, UserRole, RateConfig } from '../types';
 import { StorageService } from '../services/storageService';
-import { Trash2, UserPlus, Save, DollarSign, Plus, CheckCircle, Zap, Clock, CircleDashed } from 'lucide-react';
+import { Trash2, UserPlus, Save, DollarSign, Plus, CheckCircle, Zap, Clock, CircleDashed, Maximize2, BellRing, Mail, Smartphone } from 'lucide-react';
 
 interface Props {
-  view: 'users' | 'rates' | 'features';
+  view: 'users' | 'rates' | 'features' | 'workflow';
 }
 
 export const AdminPanel: React.FC<Props> = ({ view }) => {
@@ -15,10 +15,14 @@ export const AdminPanel: React.FC<Props> = ({ view }) => {
   // Mock features list for the "Add new feature" requirement
   const [features, setFeatures] = useState<Array<{name: string, status: 'Active' | 'Beta' | 'Planned'}>>([
     { name: "Dark Mode Support", status: 'Beta' },
-    { name: "Mobile Push Notifications", status: 'Planned' },
+    { name: "Mobile Push Notifications", status: 'Active' },
     { name: "Email Notification Service", status: 'Active' }
   ]);
   const [newFeatureText, setNewFeatureText] = useState("");
+
+  // Workflow Oversight State
+  const [workflowRequests] = useState(StorageService.getRequests().filter(r => r.status === 'Pending Approval' && r.currentApproverRole));
+  const [nudgeLoading, setNudgeLoading] = useState<string | null>(null);
 
   const handleAddUser = (e: React.FormEvent) => {
     e.preventDefault();
@@ -52,12 +56,123 @@ export const AdminPanel: React.FC<Props> = ({ view }) => {
     }
   }
 
+  const handleNudge = (role: string, type: 'email' | 'whatsapp') => {
+      const targetKey = `${role}-${type}`;
+      setNudgeLoading(targetKey);
+      
+      // Simulate API call
+      setTimeout(() => {
+          const targetUsers = users.filter(u => u.role === role);
+          targetUsers.forEach(u => {
+             StorageService.sendAdminReminder(u.id, type === 'email' ? 'Urgent: Approval Required' : 'Reminder: Check TSM App');
+          });
+          alert(`Simulated ${type === 'email' ? 'Email' : 'WhatsApp'} sent to all ${role} users.`);
+          setNudgeLoading(null);
+      }, 1500);
+  }
+
+  if (view === 'workflow') {
+      // Group pending requests by role
+      const bottleneckMap: Record<string, number> = {};
+      workflowRequests.forEach(r => {
+          if(r.currentApproverRole) {
+              bottleneckMap[r.currentApproverRole] = (bottleneckMap[r.currentApproverRole] || 0) + 1;
+          }
+      });
+
+      return (
+          <div className="animate-enter-3d space-y-8">
+              <div className="flex items-center justify-between">
+                <h2 className="text-2xl font-black text-industrial-800 uppercase tracking-tight">Workflow Oversight</h2>
+                <div className="bg-red-50 text-red-600 px-4 py-2 rounded-lg font-bold text-xs uppercase border border-red-100 flex items-center gap-2">
+                    <CircleDashed className="animate-spin" size={14} />
+                    {workflowRequests.length} Pending Actions Global
+                </div>
+              </div>
+
+              <div className="grid gap-6">
+                  {Object.entries(bottleneckMap).map(([role, count]) => {
+                      const responsibleUsers = users.filter(u => u.role === role);
+                      return (
+                          <div key={role} className="bg-white rounded-xl shadow-card border border-industrial-200 p-6 flex flex-col md:flex-row items-center justify-between gap-6">
+                              <div className="flex-1">
+                                  <div className="flex items-center gap-3 mb-2">
+                                      <h3 className="text-lg font-black text-industrial-800 uppercase">{role}</h3>
+                                      <span className="bg-red-100 text-red-600 px-2 py-0.5 rounded text-xs font-bold uppercase">{count} Stuck Requests</span>
+                                  </div>
+                                  <p className="text-sm text-industrial-500 mb-3">Responsible Personnel:</p>
+                                  <div className="flex flex-wrap gap-2">
+                                      {responsibleUsers.map(u => (
+                                          <span key={u.id} className="bg-industrial-50 border border-industrial-200 px-2 py-1 rounded text-xs font-mono text-industrial-600 flex items-center gap-1">
+                                              <div className="w-1.5 h-1.5 bg-green-500 rounded-full"></div>
+                                              {u.name}
+                                          </span>
+                                      ))}
+                                      {responsibleUsers.length === 0 && <span className="text-xs text-red-400 italic">No users assigned to this role!</span>}
+                                  </div>
+                              </div>
+
+                              <div className="flex gap-3 w-full md:w-auto">
+                                  <button 
+                                    onClick={() => handleNudge(role, 'email')}
+                                    disabled={!!nudgeLoading}
+                                    className="flex-1 md:flex-none flex items-center justify-center gap-2 px-4 py-3 bg-white border-2 border-industrial-100 hover:border-brand-300 text-industrial-600 hover:text-brand-600 rounded-lg font-bold text-xs uppercase transition-all shadow-sm"
+                                  >
+                                      {nudgeLoading === `${role}-email` ? <CircleDashed className="animate-spin" size={16}/> : <Mail size={16} />}
+                                      Send Email
+                                  </button>
+                                  <button 
+                                    onClick={() => handleNudge(role, 'whatsapp')}
+                                    disabled={!!nudgeLoading}
+                                    className="flex-1 md:flex-none flex items-center justify-center gap-2 px-4 py-3 bg-emerald-500 hover:bg-emerald-400 text-white rounded-lg font-bold text-xs uppercase transition-all shadow-lg hover:shadow-emerald-500/30"
+                                  >
+                                       {nudgeLoading === `${role}-whatsapp` ? <CircleDashed className="animate-spin" size={16}/> : <Smartphone size={16} />}
+                                      WhatsApp Nudge
+                                  </button>
+                              </div>
+                          </div>
+                      )
+                  })}
+
+                  {Object.keys(bottleneckMap).length === 0 && (
+                      <div className="p-12 text-center border-2 border-dashed border-industrial-200 rounded-xl">
+                          <CheckCircle className="mx-auto text-emerald-400 mb-4" size={48} />
+                          <h3 className="text-industrial-400 font-bold uppercase">No Bottlenecks Detected</h3>
+                          <p className="text-xs text-industrial-300 mt-2">All workflows are proceeding smoothly.</p>
+                      </div>
+                  )}
+              </div>
+          </div>
+      );
+  }
+
   if (view === 'rates') {
     return (
       <div className="max-w-2xl animate-enter-3d">
         <h2 className="text-2xl font-black text-industrial-800 mb-6 uppercase tracking-tight">Rate Configuration</h2>
         <div className="bg-white p-8 rounded-xl shadow-card border border-industrial-200">
            <form onSubmit={handleUpdateConfig} className="space-y-6">
+              
+              {/* Capacity Config */}
+              <div>
+                <label className="block text-xs font-bold text-industrial-500 uppercase mb-2">Total Facility Capacity (SqFt)</label>
+                <div className="relative group">
+                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                    <Maximize2 size={18} className="text-industrial-400" />
+                  </div>
+                  <input 
+                    type="number" step="100"
+                    className="pl-12 w-full px-4 py-3 bg-white border-2 border-industrial-200 rounded-lg text-industrial-900 font-mono font-bold focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 outline-none transition-all shadow-sm hover:shadow-md"
+                    value={config.totalWarehouseSqFt || 50000}
+                    onChange={(e) => setConfig({...config, totalWarehouseSqFt: parseFloat(e.target.value)})}
+                  />
+                </div>
+                <p className="text-xs text-industrial-400 mt-2 font-mono">Used to calculate analytics utilization percentages.</p>
+              </div>
+
+              <div className="border-t border-industrial-100 my-6"></div>
+
+              {/* Rate Config */}
               <div>
                 <label className="block text-xs font-bold text-industrial-500 uppercase mb-2">Base Rate per Square Foot (SqFt) / Day</label>
                 <div className="relative group">
@@ -84,9 +199,9 @@ export const AdminPanel: React.FC<Props> = ({ view }) => {
                 />
               </div>
 
-              <button type="submit" className="flex items-center space-x-2 px-8 py-3 bg-brand-600 text-white rounded-lg hover:bg-brand-500 font-bold uppercase tracking-wider shadow-lg hover:shadow-brand-500/30 transition-all transform hover:-translate-y-0.5">
+              <button type="submit" className="flex items-center space-x-2 px-8 py-3 bg-brand-600 text-white rounded-lg hover:bg-brand-500 font-bold uppercase tracking-wider shadow-lg hover:shadow-brand-500/30 transition-all transform hover:-translate-y-0.5 w-full justify-center">
                 <Save size={18} />
-                <span>Save Changes</span>
+                <span>Save Configuration</span>
               </button>
            </form>
         </div>
