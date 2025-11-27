@@ -25,6 +25,8 @@ export interface User {
   email: string;
   role: UserRole;
   department?: string;
+  workId?: string; // Added Work ID
+  phone?: string;  // Added Phone Number
 }
 
 export interface UserNotification {

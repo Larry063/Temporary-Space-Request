@@ -72,11 +72,11 @@ export const GlobalAnalytics: React.FC = () => {
             <div className="flex w-full justify-between px-8 text-xs font-mono font-bold text-industrial-600 mt-2">
                 <div className="flex items-center gap-2">
                     <div className="w-3 h-3 bg-brand-500 rounded-sm"></div>
-                    Used: {data.usedSqFt.toLocaleString()}
+                    Used: {data.usedSqFt.toLocaleString()} SQFT
                 </div>
                 <div className="flex items-center gap-2">
                     <div className="w-3 h-3 bg-industrial-200 rounded-sm"></div>
-                    Free: {data.freeSqFt.toLocaleString()}
+                    Balance: {data.freeSqFt.toLocaleString()} SQFT
                 </div>
             </div>
         </div>

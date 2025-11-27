@@ -151,7 +151,7 @@ export const DashboardRequester: React.FC<Props> = ({ currentUser, onNavigate })
                             onClick={() => handleVacate(req)}
                             className="bg-white border border-orange-200 text-orange-700 px-3 py-1.5 rounded text-xs font-bold uppercase hover:bg-orange-100 flex items-center gap-2"
                           >
-                             <LogOut size={14} /> Stop (Vacate)
+                             <LogOut size={14} /> End (Vacate)
                           </button>
                           <button 
                             onClick={() => handleRenew(req)}

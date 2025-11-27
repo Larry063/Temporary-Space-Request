@@ -2,13 +2,13 @@ import { User, UserRole, SpaceRequest, RequestStatus, RateConfig, APPROVAL_CHAIN
 
 // Initial Seed Data
 const INITIAL_USERS: User[] = [
-  { id: 'u1', name: 'System Admin', email: 'admin@tsm.com', role: UserRole.ADMIN },
-  { id: 'u2', name: 'John Doe', email: 'john@requester.com', role: UserRole.REQUESTER, department: 'Engineering' },
-  { id: 'u3', name: 'Alice BUM', email: 'alice@bum.com', role: UserRole.BUM },
-  { id: 'u4', name: 'Bob WCM', email: 'bob@wcm.com', role: UserRole.WCM },
-  { id: 'u5', name: 'Charlie IE', email: 'charlie@iefm.com', role: UserRole.IE_FM },
-  { id: 'u6', name: 'David MFG', email: 'david@mfgfm.com', role: UserRole.MFG_FM },
-  { id: 'u7', name: 'Eve Plant', email: 'eve@ieplant.com', role: UserRole.IE_PLANT },
+  { id: 'u1', name: 'System Admin', email: 'admin@tsm.com', role: UserRole.ADMIN, workId: 'ADM-001', phone: '+1 555-0199' },
+  { id: 'u2', name: 'John Doe', email: 'john@requester.com', role: UserRole.REQUESTER, department: 'Engineering', workId: 'ENG-102', phone: '+1 555-0234' },
+  { id: 'u3', name: 'Alice BUM', email: 'alice@bum.com', role: UserRole.BUM, workId: 'MGT-501', phone: '+1 555-0555' },
+  { id: 'u4', name: 'Bob WCM', email: 'bob@wcm.com', role: UserRole.WCM, workId: 'OPS-202', phone: '+1 555-0678' },
+  { id: 'u5', name: 'Charlie IE', email: 'charlie@iefm.com', role: UserRole.IE_FM, workId: 'FAC-303', phone: '+1 555-0789' },
+  { id: 'u6', name: 'David MFG', email: 'david@mfgfm.com', role: UserRole.MFG_FM, workId: 'MFG-404', phone: '+1 555-0890' },
+  { id: 'u7', name: 'Eve Plant', email: 'eve@ieplant.com', role: UserRole.IE_PLANT, workId: 'PLT-606', phone: '+1 555-0901' },
 ];
 
 const INITIAL_RATE_CONFIG: RateConfig = {

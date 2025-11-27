@@ -235,7 +235,7 @@ export const DashboardApprover: React.FC<Props> = ({ currentUser }) => {
                           className="flex-1 md:flex-none flex items-center justify-center space-x-2 px-6 py-3 bg-white border border-red-200 text-red-600 rounded-lg font-bold uppercase text-xs tracking-wider hover:bg-red-50 hover:border-red-300 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200"
                        >
                           <XCircle size={16} />
-                          <span>Deny</span>
+                          <span>Reject</span>
                        </button>
                        <button
                           onClick={() => handleAction(req, 'approve')}
@@ -247,7 +247,7 @@ export const DashboardApprover: React.FC<Props> = ({ currentUser }) => {
                           ) : (
                               <>
                                   <CheckCircle size={16} />
-                                  <span>Authorize</span>
+                                  <span>Approve</span>
                               </>
                           )}
                        </button>

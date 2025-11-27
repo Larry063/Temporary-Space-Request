@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { User, UserRole, RateConfig } from '../types';
 import { StorageService } from '../services/storageService';
-import { Trash2, UserPlus, Save, DollarSign, Plus, CheckCircle, Zap, Clock, CircleDashed, Maximize2, BellRing, Mail, Smartphone } from 'lucide-react';
+import { Trash2, UserPlus, Save, DollarSign, Plus, CheckCircle, Zap, Clock, CircleDashed, Maximize2, BellRing, Mail, Smartphone, Hash, Phone } from 'lucide-react';
 
 interface Props {
   view: 'users' | 'rates' | 'features' | 'workflow';
@@ -10,7 +10,7 @@ interface Props {
 export const AdminPanel: React.FC<Props> = ({ view }) => {
   const [users, setUsers] = useState<User[]>(StorageService.getUsers());
   const [config, setConfig] = useState<RateConfig>(StorageService.getRateConfig());
-  const [newUser, setNewUser] = useState<Partial<User>>({ role: UserRole.REQUESTER, name: '', email: '' });
+  const [newUser, setNewUser] = useState<Partial<User>>({ role: UserRole.REQUESTER, name: '', email: '', workId: '', phone: '' });
   
   // Mock features list for the "Add new feature" requirement
   const [features, setFeatures] = useState<Array<{name: string, status: 'Active' | 'Beta' | 'Planned'}>>([
@@ -32,10 +32,12 @@ export const AdminPanel: React.FC<Props> = ({ view }) => {
       id: Date.now().toString(),
       name: newUser.name,
       email: newUser.email,
-      role: newUser.role
+      role: newUser.role,
+      workId: newUser.workId || 'N/A',
+      phone: newUser.phone || 'N/A'
     });
     setUsers(StorageService.getUsers());
-    setNewUser({ role: UserRole.REQUESTER, name: '', email: '' });
+    setNewUser({ role: UserRole.REQUESTER, name: '', email: '', workId: '', phone: '' });
   };
 
   const handleRemoveUser = (id: string) => {
@@ -290,9 +292,9 @@ export const AdminPanel: React.FC<Props> = ({ view }) => {
             Add New User
         </h3>
         
-        <form onSubmit={handleAddUser} className="grid grid-cols-1 md:grid-cols-4 gap-6 items-end">
+        <form onSubmit={handleAddUser} className="grid grid-cols-1 md:grid-cols-3 gap-6 items-end">
           <div className="md:col-span-1">
-            <label className="block text-xs font-bold text-industrial-500 uppercase mb-2">Name</label>
+            <label className="block text-xs font-bold text-industrial-500 uppercase mb-2">Full Name</label>
             <input 
               required
               className="w-full px-4 py-3 bg-white border-2 border-industrial-200 rounded-lg text-industrial-900 font-medium focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 outline-none transition-all shadow-sm"
@@ -301,6 +303,23 @@ export const AdminPanel: React.FC<Props> = ({ view }) => {
               placeholder="Full Name"
             />
           </div>
+
+          <div className="md:col-span-1">
+            <label className="block text-xs font-bold text-industrial-500 uppercase mb-2">Work ID</label>
+             <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-industrial-400">
+                    <Hash size={16} />
+                </div>
+                <input 
+                required
+                className="w-full pl-10 px-4 py-3 bg-white border-2 border-industrial-200 rounded-lg text-industrial-900 font-mono font-medium focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 outline-none transition-all shadow-sm"
+                value={newUser.workId}
+                onChange={(e) => setNewUser({...newUser, workId: e.target.value})}
+                placeholder="e.g. ADM-001"
+                />
+            </div>
+          </div>
+
           <div className="md:col-span-1">
             <label className="block text-xs font-bold text-industrial-500 uppercase mb-2">Email</label>
             <input 
@@ -312,6 +331,23 @@ export const AdminPanel: React.FC<Props> = ({ view }) => {
               placeholder="user@example.com"
             />
           </div>
+
+           <div className="md:col-span-1">
+            <label className="block text-xs font-bold text-industrial-500 uppercase mb-2">Phone Number</label>
+            <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-industrial-400">
+                    <Phone size={16} />
+                </div>
+                <input 
+                type="tel"
+                className="w-full pl-10 px-4 py-3 bg-white border-2 border-industrial-200 rounded-lg text-industrial-900 font-mono font-medium focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 outline-none transition-all shadow-sm"
+                value={newUser.phone}
+                onChange={(e) => setNewUser({...newUser, phone: e.target.value})}
+                placeholder="+1 555-0000"
+                />
+            </div>
+          </div>
+
           <div className="md:col-span-1">
             <label className="block text-xs font-bold text-industrial-500 uppercase mb-2">Role Assignment</label>
             <div className="relative">
@@ -342,18 +378,32 @@ export const AdminPanel: React.FC<Props> = ({ view }) => {
         <table className="w-full text-left">
           <thead className="bg-industrial-50 border-b border-industrial-100">
             <tr>
-              <th className="px-8 py-4 text-[10px] font-bold text-industrial-500 uppercase tracking-widest">Name</th>
-              <th className="px-8 py-4 text-[10px] font-bold text-industrial-500 uppercase tracking-widest">Email</th>
-              <th className="px-8 py-4 text-[10px] font-bold text-industrial-500 uppercase tracking-widest">Role</th>
-              <th className="px-8 py-4 text-[10px] font-bold text-industrial-500 uppercase tracking-widest text-right">Actions</th>
+              <th className="px-6 py-4 text-[10px] font-bold text-industrial-500 uppercase tracking-widest">Name / ID</th>
+              <th className="px-6 py-4 text-[10px] font-bold text-industrial-500 uppercase tracking-widest">Contact Info</th>
+              <th className="px-6 py-4 text-[10px] font-bold text-industrial-500 uppercase tracking-widest">Role</th>
+              <th className="px-6 py-4 text-[10px] font-bold text-industrial-500 uppercase tracking-widest text-right">Actions</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-industrial-100">
             {users.map(user => (
               <tr key={user.id} className="hover:bg-brand-50/30 transition-colors group">
-                <td className="px-8 py-5 text-sm font-bold text-industrial-800">{user.name}</td>
-                <td className="px-8 py-5 text-sm font-medium text-industrial-600 font-mono">{user.email}</td>
-                <td className="px-8 py-5">
+                <td className="px-6 py-5">
+                    <div className="text-sm font-bold text-industrial-800">{user.name}</div>
+                    <div className="text-xs text-industrial-500 font-mono mt-0.5 bg-industrial-100 inline-block px-1.5 rounded">{user.workId || 'N/A'}</div>
+                </td>
+                <td className="px-6 py-5">
+                    <div className="text-sm font-medium text-industrial-600 font-mono flex items-center gap-2">
+                         <Mail size={12} className="text-industrial-400" />
+                         {user.email}
+                    </div>
+                    {user.phone && (
+                        <div className="text-xs text-industrial-500 font-mono mt-1 flex items-center gap-2">
+                             <Phone size={12} className="text-industrial-400" />
+                             {user.phone}
+                        </div>
+                    )}
+                </td>
+                <td className="px-6 py-5">
                   <span className={`inline-flex items-center px-2.5 py-1 rounded-md text-xs font-bold uppercase tracking-wide border ${
                       user.role === UserRole.ADMIN ? 'bg-purple-50 text-purple-700 border-purple-200' : 
                       user.role === UserRole.REQUESTER ? 'bg-brand-50 text-brand-700 border-brand-200' :
@@ -362,7 +412,7 @@ export const AdminPanel: React.FC<Props> = ({ view }) => {
                     {user.role}
                   </span>
                 </td>
-                <td className="px-8 py-5 text-right">
+                <td className="px-6 py-5 text-right">
                   {user.role !== UserRole.ADMIN && (
                     <button 
                       onClick={() => handleRemoveUser(user.id)}
