@@ -6,7 +6,6 @@ const INITIAL_USERS: User[] = [
   { id: 'u2', name: 'John Doe', email: 'john@requester.com', role: UserRole.REQUESTER, department: 'Engineering', workId: 'ENG-102', phone: '+1 555-0234' },
   { id: 'u3', name: 'Alice BUM', email: 'alice@bum.com', role: UserRole.BUM, workId: 'MGT-501', phone: '+1 555-0555' },
   { id: 'u4', name: 'Bob WCM', email: 'bob@wcm.com', role: UserRole.WCM, workId: 'OPS-202', phone: '+1 555-0678' },
-  { id: 'u5', name: 'Charlie IE', email: 'charlie@iefm.com', role: UserRole.IE_FM, workId: 'FAC-303', phone: '+1 555-0789' },
   { id: 'u6', name: 'David MFG', email: 'david@mfgfm.com', role: UserRole.MFG_FM, workId: 'MFG-404', phone: '+1 555-0890' },
   { id: 'u7', name: 'Eve Plant', email: 'eve@ieplant.com', role: UserRole.IE_PLANT, workId: 'PLT-606', phone: '+1 555-0901' },
 ];
@@ -18,6 +17,7 @@ const INITIAL_RATE_CONFIG: RateConfig = {
 };
 
 // Seed some realistic requests for demo purposes
+// Converted dimensions from m to cm (x100)
 const INITIAL_REQUESTS: SpaceRequest[] = [
   {
     id: 'REQ-1001',
@@ -29,9 +29,9 @@ const INITIAL_REQUESTS: SpaceRequest[] = [
     costCenter: 'CC-EN-500',
     dateIn: '2025-03-01', // Future
     dateOut: '2025-03-15', // Future
-    length: 2.5,
-    width: 1.5,
-    height: 1.8,
+    length: 250, // 2.5m
+    width: 150,  // 1.5m
+    height: 180, // 1.8m
     calculatedRate: 2372.25,
     status: RequestStatus.PENDING,
     currentApproverRole: UserRole.BUM,
@@ -49,16 +49,15 @@ const INITIAL_REQUESTS: SpaceRequest[] = [
     costCenter: 'CC-MFG-102',
     dateIn: '2024-02-10',
     dateOut: '2025-12-20',
-    length: 1.2,
-    width: 1.2,
-    height: 2.0,
+    length: 120, // 1.2m
+    width: 120,  // 1.2m
+    height: 200, // 2.0m
     calculatedRate: 650.90,
     status: RequestStatus.APPROVED,
     currentApproverRole: null,
     approvalHistory: [
       { role: UserRole.BUM, approverName: 'Alice BUM', status: 'Approved', timestamp: '2024-02-01T10:00:00Z' },
       { role: UserRole.WCM, approverName: 'Bob WCM', status: 'Approved', timestamp: '2024-02-01T14:30:00Z' },
-      { role: UserRole.IE_FM, approverName: 'Charlie IE', status: 'Approved', timestamp: '2024-02-02T09:15:00Z' },
       { role: UserRole.MFG_FM, approverName: 'David MFG', status: 'Approved', timestamp: '2024-02-02T11:00:00Z' },
       { role: UserRole.IE_PLANT, approverName: 'Eve Plant', status: 'Approved', timestamp: '2024-02-03T08:45:00Z' }
     ],
@@ -74,9 +73,9 @@ const INITIAL_REQUESTS: SpaceRequest[] = [
     costCenter: 'CC-OPS-900',
     dateIn: '2024-01-10',
     dateOut: '2024-04-10',
-    length: 5.0,
-    width: 1.0,
-    height: 0.5,
+    length: 500, // 5.0m
+    width: 100,  // 1.0m
+    height: 50,  // 0.5m
     calculatedRate: 20451.60,
     status: RequestStatus.REJECTED,
     currentApproverRole: null,
@@ -96,16 +95,15 @@ const INITIAL_REQUESTS: SpaceRequest[] = [
     costCenter: 'CC-TEST-100',
     dateIn: '2023-12-01',
     dateOut: '2023-12-31',
-    length: 2.0,
-    width: 2.0,
-    height: 1.5,
+    length: 200, // 2.0m
+    width: 200,  // 2.0m
+    height: 150, // 1.5m
     calculatedRate: 11299.20,
     status: RequestStatus.EXPIRED,
     currentApproverRole: null,
     approvalHistory: [
         { role: UserRole.BUM, approverName: 'Alice BUM', status: 'Approved', timestamp: '2023-11-20T10:00:00Z' },
         { role: UserRole.WCM, approverName: 'Bob WCM', status: 'Approved', timestamp: '2023-11-20T14:30:00Z' },
-        { role: UserRole.IE_FM, approverName: 'Charlie IE', status: 'Approved', timestamp: '2023-11-21T09:15:00Z' },
         { role: UserRole.MFG_FM, approverName: 'David MFG', status: 'Approved', timestamp: '2023-11-21T11:00:00Z' },
         { role: UserRole.IE_PLANT, approverName: 'Eve Plant', status: 'Approved', timestamp: '2023-11-22T08:45:00Z' }
     ],
@@ -344,7 +342,10 @@ export const StorageService = {
 
     requests.forEach(req => {
         if (activeStatuses.includes(req.status)) {
-            const sqFt = req.length * req.width * 10.764;
+            // Convert cm to meters: L/100 * W/100
+            // Then m^2 to sq ft: * 10.764
+            // Simplified: (L_cm * W_cm * 10.764) / 10000
+            const sqFt = (req.length * req.width * 10.764) / 10000;
             usedSqFt += sqFt;
             
             // Categorize by Work Cell

@@ -116,7 +116,8 @@ export const DashboardRequester: React.FC<Props> = ({ currentUser, onNavigate })
         )}
 
         {requests.map((req, idx) => {
-          const areaSqFt = (req.length * req.width * 10.764).toFixed(2);
+          // Calculate sq ft from cm: (L * W * 10.764) / 10000
+          const areaSqFt = ((req.length * req.width * 10.764) / 10000).toFixed(2);
           const isExpired = req.status === RequestStatus.EXPIRED;
           const isOverstay = req.status === RequestStatus.OVERSTAY;
 
@@ -191,7 +192,7 @@ export const DashboardRequester: React.FC<Props> = ({ currentUser, onNavigate })
                     <Maximize2 className="mr-2 text-brand-500" size={14} />
                     {areaSqFt} SQFT
                   </span>
-                  <span className="text-[9px] text-industrial-400 mt-1 pl-6">({req.length}m × {req.width}m)</span>
+                  <span className="text-[9px] text-industrial-400 mt-1 pl-6">({req.length}cm × {req.width}cm)</span>
                 </div>
                 <div className="flex flex-col p-3 bg-industrial-50/50 rounded-lg border border-industrial-100/50 group-hover:border-industrial-200 transition-colors">
                   <span className="text-[10px] font-bold text-industrial-400 uppercase tracking-wider mb-1">Duration</span>

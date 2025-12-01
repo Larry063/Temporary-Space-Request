@@ -3,7 +3,6 @@ export enum UserRole {
   REQUESTER = 'Requester',
   BUM = 'BUM',
   WCM = 'WCM',
-  IE_FM = 'IE FM',
   MFG_FM = 'MFG FM',
   IE_PLANT = 'IE Plant'
 }
@@ -49,9 +48,9 @@ export interface SpaceRequest {
   costCenter: string;
   dateIn: string;
   dateOut: string;
-  length: number; // in meters
-  width: number; // in meters
-  height: number; // in meters
+  length: number; // in cm
+  width: number; // in cm
+  height: number; // in cm
   calculatedRate: number;
   status: RequestStatus;
   currentApproverRole: UserRole | null; // Who needs to approve next
@@ -77,7 +76,6 @@ export interface RateConfig {
 export const APPROVAL_CHAIN = [
   UserRole.BUM,
   UserRole.WCM,
-  UserRole.IE_FM,
   UserRole.MFG_FM,
   UserRole.IE_PLANT
 ];

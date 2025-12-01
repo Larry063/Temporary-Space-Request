@@ -148,7 +148,8 @@ export const DashboardApprover: React.FC<Props> = ({ currentUser }) => {
       {/* STANDARD APPROVALS */}
       <div className="grid gap-8">
         {pendingRequests.map(req => {
-            const sqFt = (req.length * req.width * 10.764).toFixed(2);
+            // (L * W * 10.764) / 10000
+            const sqFt = ((req.length * req.width * 10.764) / 10000).toFixed(2);
             return (
           <div key={req.id} className="bg-white rounded-xl border border-industrial-200 shadow-card hover:shadow-3d transition-all duration-500 transform hover:-translate-y-1">
             
@@ -180,7 +181,7 @@ export const DashboardApprover: React.FC<Props> = ({ currentUser }) => {
                                 {sqFt}
                              </span>
                              <div className="text-[10px] text-industrial-400 mt-1 font-mono">
-                                Dim: {req.length}m x {req.width}m
+                                Dim: {req.length}cm x {req.width}cm
                              </div>
                           </div>
                           <div className="p-4 bg-white border border-industrial-200 rounded-lg shadow-sm">

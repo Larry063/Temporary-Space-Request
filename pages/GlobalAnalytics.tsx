@@ -181,7 +181,7 @@ export const GlobalAnalytics: React.FC = () => {
                                   </span>
                               </td>
                               <td className="px-6 py-4 text-right text-sm font-mono font-bold text-industrial-700">
-                                  {(req.length * req.width * 10.764).toFixed(1)}
+                                  {((req.length * req.width * 10.764) / 10000).toFixed(1)}
                               </td>
                           </tr>
                       ))}

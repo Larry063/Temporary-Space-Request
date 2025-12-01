@@ -63,11 +63,10 @@ export const NewRequest: React.FC<Props> = ({ currentUser, onSuccess, preFillDat
       ? Math.max(0, differenceInDays(new Date(formData.dateOut), new Date(formData.dateIn))) 
       : 0;
     
-    // Calculate Area in Meters Squared
-    const areaM2 = formData.length * formData.width;
-    
-    // Convert to Square Feet (1 m² = 10.7639 sq ft)
-    const sqFt = areaM2 * 10.7639;
+    // Calculate Area
+    // Inputs are in cm. Convert to SqFt.
+    // Formula: (L(cm) * W(cm) * 10.7639) / 10000
+    const sqFt = (formData.length * formData.width * 10.7639) / 10000;
     setAreaSqFt(sqFt);
 
     // Calculate Cost: SqFt * Rate * Days
@@ -261,9 +260,9 @@ export const NewRequest: React.FC<Props> = ({ currentUser, onSuccess, preFillDat
                 )}
 
               <div className="grid grid-cols-3 gap-4 mb-6 bg-industrial-50/50 p-6 rounded-xl border border-industrial-100/50">
-                <InputField label="Length (M)" name="length" type="number" step="0.1" />
-                <InputField label="Width (M)" name="width" type="number" step="0.1" />
-                <InputField label="Height (M)" name="height" type="number" step="0.1" />
+                <InputField label="Length (cm)" name="length" type="number" step="1" />
+                <InputField label="Width (cm)" name="width" type="number" step="1" />
+                <InputField label="Height (cm)" name="height" type="number" step="1" />
               </div>
 
               <div className="grid grid-cols-2 gap-4">

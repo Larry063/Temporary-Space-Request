@@ -17,7 +17,7 @@ export const GeminiService = {
         
         Machine Name: ${request.machineName}
         Description: ${request.workCell}
-        Dimensions: ${request.length}m x ${request.width}m x ${request.height}m
+        Dimensions: ${request.length}cm x ${request.width}cm x ${request.height}cm
         Duration: From ${request.dateIn} to ${request.dateOut}
         
         Please provide a very brief (max 2 sentences) assessment:
