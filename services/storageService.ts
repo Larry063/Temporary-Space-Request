@@ -18,6 +18,7 @@ const INITIAL_RATE_CONFIG: RateConfig = {
 
 // Seed some realistic requests for demo purposes
 // Converted dimensions from m to cm (x100)
+// calculatedRate = SqFt * 4.20
 const INITIAL_REQUESTS: SpaceRequest[] = [
   {
     id: 'REQ-1001',
@@ -29,10 +30,10 @@ const INITIAL_REQUESTS: SpaceRequest[] = [
     costCenter: 'CC-EN-500',
     dateIn: '2025-03-01', // Future
     dateOut: '2025-03-15', // Future
-    length: 250, // 2.5m
+    length: 250, // 2.5m -> ~40.36 sqft
     width: 150,  // 1.5m
     height: 180, // 1.8m
-    calculatedRate: 2372.25,
+    calculatedRate: 169.51, // 40.36 * 4.2
     status: RequestStatus.PENDING,
     currentApproverRole: UserRole.BUM,
     approvalHistory: [],
@@ -49,10 +50,10 @@ const INITIAL_REQUESTS: SpaceRequest[] = [
     costCenter: 'CC-MFG-102',
     dateIn: '2024-02-10',
     dateOut: '2025-12-20',
-    length: 120, // 1.2m
+    length: 120, // 1.2m -> ~15.5 sqft
     width: 120,  // 1.2m
     height: 200, // 2.0m
-    calculatedRate: 650.90,
+    calculatedRate: 65.10, // 15.5 * 4.2
     status: RequestStatus.APPROVED,
     currentApproverRole: null,
     approvalHistory: [
@@ -73,10 +74,10 @@ const INITIAL_REQUESTS: SpaceRequest[] = [
     costCenter: 'CC-OPS-900',
     dateIn: '2024-01-10',
     dateOut: '2024-04-10',
-    length: 500, // 5.0m
+    length: 500, // 5.0m -> ~53.82 sqft
     width: 100,  // 1.0m
     height: 50,  // 0.5m
-    calculatedRate: 20451.60,
+    calculatedRate: 226.04, // 53.82 * 4.2
     status: RequestStatus.REJECTED,
     currentApproverRole: null,
     approvalHistory: [
@@ -95,10 +96,10 @@ const INITIAL_REQUESTS: SpaceRequest[] = [
     costCenter: 'CC-TEST-100',
     dateIn: '2023-12-01',
     dateOut: '2023-12-31',
-    length: 200, // 2.0m
+    length: 200, // 2.0m -> ~43.06 sqft
     width: 200,  // 2.0m
     height: 150, // 1.5m
-    calculatedRate: 11299.20,
+    calculatedRate: 180.85, // 43.06 * 4.2
     status: RequestStatus.EXPIRED,
     currentApproverRole: null,
     approvalHistory: [

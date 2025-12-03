@@ -58,19 +58,14 @@ export const NewRequest: React.FC<Props> = ({ currentUser, onSuccess, preFillDat
   }, [preFillData]);
 
   useEffect(() => {
-    // Recalculate cost when inputs change
-    const days = (formData.dateIn && formData.dateOut) 
-      ? Math.max(0, differenceInDays(new Date(formData.dateOut), new Date(formData.dateIn))) 
-      : 0;
-    
     // Calculate Area
     // Inputs are in cm. Convert to SqFt.
     // Formula: (L(cm) * W(cm) * 10.7639) / 10000
     const sqFt = (formData.length * formData.width * 10.7639) / 10000;
     setAreaSqFt(sqFt);
 
-    // Calculate Cost: SqFt * Rate * Days
-    const cost = sqFt * config.baseRatePerSquareFoot * (days || 1);
+    // Calculate Cost: SqFt * Rate (Flat rate, ignoring duration)
+    const cost = sqFt * config.baseRatePerSquareFoot;
     setEstimatedCost(cost);
   }, [formData, config]);
 
@@ -310,10 +305,6 @@ export const NewRequest: React.FC<Props> = ({ currentUser, onSuccess, preFillDat
                  <div className="flex justify-between text-xs text-brand-100 font-mono">
                     <span>AREA:</span>
                     <span>{areaSqFt.toFixed(2)} SQFT</span>
-                 </div>
-                 <div className="flex justify-between text-xs text-brand-100 font-mono">
-                    <span>DAYS:</span>
-                    <span>{formData.dateIn && formData.dateOut ? differenceInDays(new Date(formData.dateOut), new Date(formData.dateIn)) : 0}</span>
                  </div>
                </div>
             </div>

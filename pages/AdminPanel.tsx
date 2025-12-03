@@ -176,7 +176,7 @@ export const AdminPanel: React.FC<Props> = ({ view }) => {
 
               {/* Rate Config */}
               <div>
-                <label className="block text-xs font-bold text-industrial-500 uppercase mb-2">Base Rate per Square Foot (SqFt) / Day</label>
+                <label className="block text-xs font-bold text-industrial-500 uppercase mb-2">Base Rate per Square Foot (SqFt)</label>
                 <div className="relative group">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                     <DollarSign size={18} className="text-brand-500" />
@@ -188,7 +188,7 @@ export const AdminPanel: React.FC<Props> = ({ view }) => {
                     onChange={(e) => setConfig({...config, baseRatePerSquareFoot: parseFloat(e.target.value)})}
                   />
                 </div>
-                <p className="text-xs text-industrial-400 mt-2 font-mono">Formula: (Length × Width × 10.764) × Rate × Days.</p>
+                <p className="text-xs text-industrial-400 mt-2 font-mono">Formula: (Length × Width × 10.764) × Rate.</p>
               </div>
 
               <div>
