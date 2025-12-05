@@ -306,6 +306,9 @@ export const NewRequest: React.FC<Props> = ({ currentUser, onSuccess, preFillDat
                     <span>AREA:</span>
                     <span>{areaSqFt.toFixed(2)} SQFT</span>
                  </div>
+                 <div className="text-[10px] text-right text-brand-400/60 font-mono italic pt-2">
+                    * Calculation: Rate × Area
+                 </div>
                </div>
             </div>
             
